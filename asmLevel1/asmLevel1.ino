@@ -120,53 +120,40 @@ class NUMpad {
   #undef DIGT_SIZE
 };
 
-class Buttom {
-  uint8_t _pin;
+NUMpad aboba(3, 10);
 
-  public:
-  Buttom(uint8_t pin) {
-    _pin = pin;
-    pinMode(_pin, INPUT);
-  }
+volatile uint8_t cnt = 0;
+volatile long prev_time = 0;
+volatile long curr_time = 0;
 
-  bool getStat () {
-    return digitalRead(_pin);
-  }
-};
+//ISR (TIMER2_OVF_vect) {
+//
+//}
 
-NUMpad display(3, 10);
-Buttom but(2);
-
-void setup() {
+void ChangeMode () {
+  prev_time = millis();
+  cnt = (cnt + 1) % 3;
 }
 
-void loop() {
-  static long prev_time = 0;
-  static long curr_time = 0;
-  static uint8_t cnt = 0;
-  static uint8_t brk = 0;
+void setup () {
+  attachInterrupt(0, ChangeMode, RISING);
+}
 
+void loop () {
   switch (cnt) {
     case 0:
       curr_time = 0;
       prev_time = millis();
-      display.printtimef(curr_time);
+      aboba.printtimef(curr_time);
       break;
     case 1:
       curr_time = millis() - prev_time;
-      display.printtimef(curr_time);
+      aboba.printtimef(curr_time);
       break;
     case 2:
       prev_time = millis();
-      display.printtimef(curr_time);
+      aboba.printtimef(curr_time);
       break;
   }
-
-  if (but.getStat() && !brk) {
-    prev_time = millis();
-    cnt = (cnt + 1) % 3;
-  }
-
-  brk = (brk + 1) % 100;
 }
 
