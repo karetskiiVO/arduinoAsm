@@ -1,0 +1,11 @@
+
+.equ DDRB  , 0x04
+.equ PORTB , 0x05
+.equ DDRD  , 0x0a
+.equ PORTD , 0x0b
+.equ TCCR2A, 0xb0
+.equ TCCR2B, 0xb1
+.equ TIMSK2, 0x70
+
+
+
