@@ -1,6 +1,10 @@
 .global Init
 .global off
 .global prtDgt
+.global prtTime
+
+.extern dgt
+.extern curr_dig
 
 .equ DDRB  , 0x04
 .equ PORTB , 0x05
@@ -18,20 +22,61 @@ Init:
     andi r18, 0b11111110
     out DDRD, r18
 
-    ldi r18,  0b00111111
-    out DDRB, r18
+    ldi  r18,  0b00111111
+    out  DDRB, r18
 
     cli
     
-    clr r18
-    sts TCCR2A, r18
-    ldi r18,  0b00000100
-    sts TCCR2B, r18
+    clr  r18
+    sts  TCCR2A, r18
+    ldi  r18,  0b00000100
+    sts  TCCR2B, r18
 
-    ldi r18,  0b00000001
-    sts TIMSK2, r18
+    ldi  r18,  0b00000001
+    sts  TIMSK2, r18
 
     sei
+
+    ldi  r18, 0b11111000
+    sts  digits +  0, r18
+    ldi  r18, 0b00111101
+    sts  digits +  1, r18
+    ldi  r18, 0b00110000
+    sts  digits +  2, r18
+    ldi  r18, 0b00111100
+    sts  digits +  3, r18
+    ldi  r18, 0b11011000
+    sts  digits +  4, r18
+    ldi  r18, 0b00111110
+    sts  digits +  5, r18
+    ldi  r18, 0b01111000
+    sts  digits +  6, r18
+    ldi  r18, 0b00111110
+    sts  digits +  7, r18
+    ldi  r18, 0b00110000
+    sts  digits +  8, r18
+    ldi  r18, 0b00111111
+    sts  digits +  9, r18
+    ldi  r18, 0b01101000
+    sts  digits + 10, r18
+    ldi  r18, 0b00111111
+    sts  digits + 11, r18
+    ldi  r18, 0b11101000
+    sts  digits + 12, r18
+    ldi  r18, 0b00111111
+    sts  digits + 13, r18
+    ldi  r18, 0b00111000
+    sts  digits + 14, r18
+    ldi  r18, 0b00111100
+    sts  digits + 15, r18
+    ldi  r18, 0b11111000
+    sts  digits + 16, r18
+    ldi  r18, 0b00111111
+    sts  digits + 17, r18
+    ldi  r18, 0b01111000
+    sts  digits + 18, r18
+    ldi  r18, 0b00111111
+    sts  digits + 19, r18
 
     ret
 ;-----------------------------
@@ -46,122 +91,43 @@ off:
     ret
 ;-----------------------------
 ;   input    r24, r22
-;   destroys r18, r20, r20, Z
+;   destroys r24, r20, r20, r28, Z
 ;-----------------------------
 prtDgt:
-    ; compute displ
-        cpi  r22, 0
-        breq dgt0
+    lsl  r24
+    ldi  r20, 0b00000100        ;mask
 
-        cpi  r22, 1
-        breq dgt1
+    L1:
+    cpi  r22, 0
+    breq L2
 
-        cpi  r22, 2
-        breq dgt2
+    lsl  r20
+    dec  r22
+    rjmp L1
+    L2:
 
-        cpi  r22, 3
-        breq dgt3
+    clr  r31
+    mov  r30, r24
 
-    bk0:
+    subi r30, lo8(-(digits))
+    sbci r31, hi8(-(digits))
 
-    ; compute digit
-        cpi  r24, 0
-        breq prt0
+    com  r20
 
-        cpi  r24, 1
-        breq prt1
-
-        cpi  r24, 2
-        breq prt2
-
-        cpi  r24, 3
-        breq prt3
-
-        cpi  r24, 4
-        breq prt4
-
-        cpi  r24, 5
-        breq prt5
-
-        cpi  r24, 6
-        breq prt6
-
-        cpi  r24, 7
-        breq prt7
-
-        cpi  r24, 8
-        breq prt8
-
-        cpi  r24, 9
-        breq prt9
-    bk1:
-
+    ldd  r18, Z + 1
     and  r18, r20
     
     out  PORTB, r18
-    out  PORTD, r16
+
+    ld   r18, Z
+    out  PORTD, r18
 
     ret
 
-prt0:
-    ldi r16, 0b11111000
-    ldi r18, 0b00111101
-    rjmp bk1
 
-prt1:
-    ldi r16, 0b00110000
-    ldi r18, 0b00111100
-    rjmp bk1
 
-prt2:
-    ldi r16, 0b11011000
-    ldi r18, 0b00111110
-    rjmp bk1
 
-prt3:
-    ldi r16, 0b01111000
-    ldi r18, 0b00111110
-    rjmp bk1
 
-prt4:
-    ldi r16, 0b00110000
-    ldi r18, 0b00111111
-    rjmp bk1
+vRam:   .byte   4
 
-prt5:
-    ldi r16, 0b01101000
-    ldi r18, 0b00111111
-    rjmp bk1
-
-prt6:
-    ldi r16, 0b11101000
-    ldi r18, 0b00111111
-    rjmp bk1
-
-prt7:
-    ldi r16, 0b00111000
-    ldi r18, 0b00111100
-    rjmp bk1
-
-prt8:
-    ldi r16, 0b11111000
-    ldi r18, 0b00111111
-    rjmp bk1
-
-prt9:
-    ldi r16, 0b01111000
-    ldi r18, 0b00111111
-    rjmp bk1
- 
-dgt0:
-    ldi  r20, 0b11111011
-    rjmp bk0
-dgt1:
-    ldi  r20, 0b11110111
-    rjmp bk0
-dgt2:
-    ldi  r20, 0b11101111
-    rjmp bk0
-dgt3:
-    ldi  r20, 0b11011111
-    rjmp bk0
+digits: .byte   20

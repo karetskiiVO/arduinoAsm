@@ -1,8 +1,10 @@
 extern "C" {
-  extern inline void     *off();
-  extern inline void    *Init();
-  extern inline void  *prtDgt(uint8_t digit, uint8_t num_displ);
+  extern inline void       off();
+  extern inline void      Init();
+  extern inline void    prtDgt(uint8_t digit, uint8_t num_displ);
 }
+//extern uint8_t Get();
+
 volatile long prev_time = 0;
 volatile long curr_time = 0;
 volatile uint8_t mode = 0;
@@ -46,5 +48,12 @@ void setup() {
   Init();
 }
 
+
 void loop() {
+  
 }
+
+
+
+
+
